@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="utf-8" />
+  <title>VJSPlayer.js Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <style>
+    .box {
+      margin: 10px 0;
+      display: flex;
+    }
+	
+	.box2 {
+      margin: 8px 0;
+      display: flex;
+    }
+
+	.divcss5-cent{margin:0 auto;width:250px;height:50px;border:1px } 
+    .fl1 {
+      flex: 1;
+    }
+
+    .fl0 {
+      flex: 0;
+    }
+  </style>
+</head>
+<body>
+ <div style="max-width:960px;margin:0 auto">
+    <h3><a  >VJSPlayer 授权</a></h3>
+     
+    <div style="width:100%; height:100%;margin-top:40px; position:relative;">
+
+	  <div class="box">
+		  <div class="fl1">
+		    <label> <font size="4" color ="#15729a"> 机器码: </font></label>
+		  </div>
+      </div>
+	  <div class="box">
+		    <div class="fl1">
+			<textarea cols="100" rows="8" id="machine_code" readonly="readonly"></textarea>
+		  </div>
+     </div>
+
+	 
+	  <div class="box">
+		  <div class="fl1">
+		    <label> <font size="4" color="#15729a"> 授权码: </font></label>
+			<label id="permit_info" > <font size="3" color="#0f9f3e" > --- </font></label>
+		  </div>
+      </div>
+	  <div class="box">
+		  <div class="fl1">
+			<textarea id="license" cols="100" rows="10"></textarea>
+		  </div>
+     </div>
+	  
+	   <div class="box">
+		  <div class="divcss5-cent">
+		      <button id="cancel" class="fl0">Reset</button>
+			   <input id="splace" type="hidden">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>
+			   <button id="ok" class="fl0">OK</button>
+		  </div>
+      </div>
+	  
+ </div>
+	
+	
+
+	<script type="text/javascript">
+
+	function PermitOKFunc() {
+		
+		var license = document.getElementById("license").value;
+	    if(  license.length < 200){
+		   alert('请先填入授权码信息！！！');
+		   return ;
+	   }
+	   document.getElementById("permit_info").innerHTML = '更在更新,请稍候 ...';
+		setTimeout(PermitOKFuncImpl,500);
+		 
+    }
+
+	function PermitOKFuncImpl() {
+		var license = document.getElementById("license").value;
+		var url = "http://localhost:3080/webcontrol/license_update";
+		var xhr = new XMLHttpRequest();
+		var resq = {};
+		resq.license = license;
+		xhr.timeout = 5000;
+		xhr.responseType = "json";
+		xhr.open('POST', url, true);
+		xhr.onload = function() {
+				if (this.status == 200) {
+				      LicenseInfoFunc();
+				 }
+		 }
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.send(JSON.stringify(resq));	
+    }
+
+    function PermitCancelFunc() {
+		document.getElementById("license").value = '';
+    }
+	
+	function LicenseInfoFunc(){
+	
+	    var url = "http://localhost:3080/webcontrol/license_info";
+		var xhr = new XMLHttpRequest();
+		var resq = {};
+		xhr.timeout = 5000;
+		xhr.responseType = "json";
+		xhr.open('POST', url, true);
+		xhr.onload = function() {
+				if (this.status == 200) {
+				     var text = '<label id="permit_info" > <font size="3" color="#9f226b" > ' + this.response.data.desc + ' (error:' +this.response.data.ecode+')</font> </label>';
+					 document.getElementById("permit_info").outerHTML = text;
+					var v = document.getElementById("permit_info");
+					document.getElementById("machine_code").value = this.response.data.machine_code;
+				 }
+		 }
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.send(JSON.stringify(resq));	
+	
+	}
+
+	var btOK = document.getElementById("ok");
+    var btCancel = document.getElementById("cancel");
+
+    if (btOK.addEventListener) {
+      btOK.addEventListener("click", PermitOKFunc, false);
+    } else if (btOK.attachEvent) {
+      btOK.attachEvent("onclick", PermitOKFunc);
+    }
+
+    if (btCancel.addEventListener) {
+      btCancel.addEventListener("click", PermitCancelFunc, false);
+    } else if (btCancel.attachEvent) {
+      btCancel.attachEvent("onclick", PermitCancelFunc);
+    }
+
+ 
+	
+	window.onload=function(){ 
+		LicenseInfoFunc();
+	} 
+		
+	</script>
+</body>
+</html>

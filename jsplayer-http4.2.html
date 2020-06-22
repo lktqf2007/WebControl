@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="utf-8" />
+  <title>VJSPlayer.js Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <style>
+    .box {
+      margin: 10px 0;
+      display: flex;
+    }
+	
+	.box2 {
+      margin: 8px 0;
+      display: flex;
+    }
+
+    .fl1 {
+      flex: 1;
+    }
+
+    .fl0 {
+      flex: 0;
+    }
+  </style>
+</head>
+<body>
+ <div style="max-width:960px;margin:0 auto">
+    <h3><a href="#" target="_blank">VJSPlayer 实时流播放示例(直连摄像机)</a></h3>
+    <div style="width:100%; padding-bottom:56.25%;position:relative;">
+      <canvas id="video_canvas" style="width:100%;height:100%;position:absolute;"></canvas>
+    </div>
+	<div style="width:100%; height:100%;margin-top:-50px; position:relative;">
+     	 <font size="3" color="red">bitrate: 2048kb/s frame_rate:25 width:1920 height:1080</font>
+	</div>
+	
+      <div class="box2" style="margin-top:40px; position:relative;">
+	    <div class="fl1">
+          <label>设备类型:</label>
+          <select id="protocol" onchange="scaleModeChange(event);">
+            <option value=2>海康 NVR</option>
+            <option value=3>大华 NVR</option>
+          </select>
+        </div>
+      </div>
+	  <div class="box">
+		  <div class="fl1">
+			  <label>通道:</label>
+			  <input id="channel"  style="width:135px" value="1" />
+		</div>
+         <div class="fl1">
+          <label>码流(0:主码流 1:辅码流):</label>
+		  <input id="stream"   value="0" />
+        </div>
+
+        <button id="play" class="fl0">Play</button>
+        <button id="stop" class="fl0">Stop</button>
+		<button id="snap" class="fl0">Snap</button>
+        <button id="full" class="fl0">Full</button>
+      </div>
+	  
+	  <div class="box">
+         <div class="fl1">
+          <label>Ip地址:</label>
+		  <input id="ipaddr"  style="width:120px" value="47.96.191.24" />
+        </div>
+
+        <div class="fl1">
+          <label>端口:</label>
+		  <input id="port"   value="8000" />
+        </div>
+		
+         <div class="fl1">
+          <label>用户:</label>
+		  <input id="user_name"   value="admin" />
+        </div>
+		 <div class="fl1">
+          <label>密码:</label>
+		  <input id="user_pwd"   value="123456" />
+        </div>
+      </div>
+     
+      <!-- /input-group -->
+     </div>
+
+ </div>
+	<script type="text/javascript" src="YUVCanvas.js"></script>
+	<script type="text/javascript" src="VJSPlayer.js"></script>
+	<script type="text/javascript">
+
+	var timestamp = new Date().getTime();
+	var canvas = document.getElementById("video_canvas");
+	canvas.style.backgroundColor = "#000000";
+	var width =  960;//canvas.width;// 960;// 1920;// 704;//
+	var height =  540;//canvas.height;// 540;// 1080;// 576;//
+	var player = new VJSPlayer({"canvas" : canvas ,"width":width,"height":height});
+	
+	function realPlayFunc() {
+	    //start play
+		var sni = {};//StreamNetInfo + RecordConditionInfo
+		sni.protocol = document.getElementById("protocol").value;;//2海康，3大华
+		sni.ipaddr = document.getElementById("ipaddr").value;
+		sni.port = document.getElementById("port").value;
+		sni.user_name = document.getElementById("user_name").value;
+		sni.user_pwd= document.getElementById("user_pwd").value;
+		sni.channel= document.getElementById("channel").value;
+		sni.stream= document.getElementById("stream").value;
+		player.realPlay(sni);
+    }
+
+    function realStopFunc() {
+      player.realStop();
+    }
+	
+	function resizeFunc() {
+      player.resize(1920,1080);
+    }
+	
+	function fullscreenFunc() {
+      player.fullscreen();
+    }
+	
+	var btPl = document.getElementById("play");
+    var btSt = document.getElementById("stop");
+	var btRs = document.getElementById("resize");
+    var btFu = document.getElementById("full");
+    if (btPl.addEventListener) {
+      btPl.addEventListener("click", realPlayFunc, false);
+    } else if (btPl.attachEvent) {
+      btPl.attachEvent("onclick", realPlayFunc);
+    }
+
+    if (btSt.addEventListener) {
+      btSt.addEventListener("click", realStopFunc, false);
+    } else if (btSt.attachEvent) {
+      btSt.attachEvent("onclick", realStopFunc);
+    }
+
+	 if (btRs.addEventListener) {
+      btRs.addEventListener("click", resizeFunc, false);
+    } else if (btRs.attachEvent) {
+      btRs.attachEvent("onclick", resizeFunc);
+    }
+
+    if (btFu.addEventListener) {
+      btFu.addEventListener("click", fullscreenFunc, false);
+    } else if (btFu.attachEvent) {
+      btFu.attachEvent("onclick", fullscreenFunc);
+    }
+		
+	</script>
+</body>
+</html>
